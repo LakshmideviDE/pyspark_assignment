@@ -1,8 +1,9 @@
 import unittest
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
-from pyspark_practice.rdd.assignment1.util import (only_product_iphone13,
+from pyspark_assignment.src.assignment1.util import (only_product_iphone13,
                                 iphone13_to_iphone14, product_unique)
+
 class Test(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -35,21 +36,25 @@ class Test(unittest.TestCase):
             ("hp i5 core",),
             ("iphone14",)
         ]
-# Create DataFrame
+        # Create DataFrame
         cls.purchase_data_df = cls.spark.createDataFrame(data=data1, schema=schema1)
         cls.product_data_df = cls.spark.createDataFrame(data=data2, schema=schema2)
+
     @classmethod
     def tearDownClass(cls):
         cls.spark.stop()
+
     def test_only_product_iphone13(self):
         result_df = only_product_iphone13(self.purchase_data_df)
-        self.assertFalse(result_df.isEmpty(), "Result DataFrame is empty")
+        self.assertTrue(result_df.count() > 0, "Result DataFrame is empty")
+
     def test_iphone13_to_iphone14(self):
-        result_df =iphone13_to_iphone14(self.purchase_data_df)
-        self.assertFalse(result_df.isEmpty(), "Result DataFrame is empty")
+        result_df = iphone13_to_iphone14(self.purchase_data_df)
+        self.assertTrue(result_df.count() > 0, "Result DataFrame is empty")
+
     def test_product_unique(self):
-        result_df =product_unique(self.purchase_data_df, self.product_data_df)
-        self.assertFalse(result_df.isEmpty(), "Result DataFrame is empty")
+        result_df = product_unique(self.purchase_data_df, self.product_data_df)
+        self.assertTrue(result_df.count() > 0, "Result DataFrame is empty")
+
 if __name__ == '__main__':
     unittest.main()
-wo
