@@ -1,4 +1,4 @@
-from pyspark_practice.rdd.assignment1.util import *
+from pyspark_assignment.src.assignment1.util import *
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.appName("Purchase_analysis").getOrCreate()
