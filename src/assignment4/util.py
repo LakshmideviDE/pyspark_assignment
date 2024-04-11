@@ -1,35 +1,31 @@
-
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import explode, explode_outer, posexplode, current_date, year, month, day
 from pyspark.sql.types import StructType, ArrayType, StringType, IntegerType, StructField, MapType
-
-json_path = r'json'
-
-json_schema = StructType([
-            StructField("employees", ArrayType(StructType([
-                StructField("id", IntegerType()),
-                StructField("name", StringType())
-            ]))),
-            StructField("id", IntegerType()),
-            StructField("properties", MapType(StringType(), StringType()))
-        ])
-
-
+from pyspark_assignment.src.assignment1.util import spark
+json_path = r'C:\Users\Lakshmidevi\OneDrive\Documents\ass4.json'
+schema = StructType([
+    StructField("id", IntegerType(), True),
+    StructField("properties", StructType([
+        StructField("name", StringType(), True),
+        StructField("storeSize", StringType(), True)
+    ]), True),
+    StructField("employees", ArrayType(StructType([
+        StructField("empId", IntegerType(), True),
+        StructField("empName", StringType(), True)
+    ])), True)
+])
 def spark_session():
-    spark = SparkSession.builder.appName("Assignment 5").getOrCreate()
+    spark = SparkSession.builder.appName("spark-assignment").getOrCreate()
     return spark
-
 
 def create_df(spark, data, schema):
     df = spark.createDataFrame(data, schema)
     return df
 
-
 # 1. Read JSON file provided in the attachment using the dynamic function
 def read_json(spark, path):
     df = spark.read.json(path, multiLine=True)
     return df
-
 
 # 2. flatten the data frame which is a custom schema
 def flatten_df(df):
@@ -38,16 +34,13 @@ def flatten_df(df):
         .select("*", "properties.name", "properties.storeSize").drop("properties", "employees", "employee")
     return flatten_json_df
 
-
 # 3. find out the record count when flattened and when it's not flattened(find out the difference why you are getting
 # more count)
-
 def count_before_after_flatten(df, flattened_df):
     print("\nBefore Flatten: ", end="")
     print(df.count())
     print("\nAfter Flatten: ", end="")
     print(flattened_df.count())
-
 
 # 4. Differentiate the difference using explode, explode outer, posexplode functions
 def diff_explode_outer_posexplode(spark):
@@ -69,11 +62,9 @@ def diff_explode_outer_posexplode(spark):
     print("PosExploded DataFrame:")
     pos_exploded_df.show()
 
-
 # 5. Filter the id which is equal to 1001
 def filter_employee_with_id(df, id):
     return df.filter(df['empId'] == id)
-
 
 # 6. convert the column names from camel case to snake case
 def toSnakeCase(dataframe):
@@ -87,12 +78,10 @@ def toSnakeCase(dataframe):
         dataframe = dataframe.withColumnRenamed(column, snake_case_col)
     return dataframe
 
-
 # 7. Add a new column named load_date with the current date
 def add_load_date_with_current_date(df):
     result = df.withColumn("load_date", current_date())
     return result
-
 
 # 8. create 3 new columns as year, month, and day from the load_date column
 def add_year_month_day(df):
